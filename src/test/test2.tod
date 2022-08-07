@@ -1,0 +1,13 @@
+this is as test
+- a task
+-- this is a comment
++ this is a done task
+done
+ -> outcome
+ new line
+ + other task
+- todo task
+new todo line
+   -> an other outcome
+outcome new line
++ last done

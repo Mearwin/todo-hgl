@@ -1,0 +1,36 @@
+{
+    "name": "todo-hgl",
+    "displayName": "todo-highlight",
+    "description": "Add highlight on *.todo files",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.67.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Mearwin/todo-hgl.git"
+      },
+    "categories": [
+        "Other"
+    ],
+    "scripts": {
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./"
+    },
+    "activationEvents": [
+        "*"
+    ],
+    "main": "./out/extension.js",
+    "contributes": {
+        "configuration": {
+            "todoHighlight.doneColor": {
+                "type": "string",
+                "default": "rgba(128,32,32,0.6)"
+            }
+        }
+    },
+    "devDependencies": {
+        "@types/vscode": "^1.67.0",
+        "typescript": "^4.6.4"
+    }
+}
