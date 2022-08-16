@@ -56,7 +56,6 @@ export function activate(context: vscode.ExtensionContext) {
 
   update();
   function update() {
-    vscode.window.showInformationMessage("Update !");
     const activeEditor = vscode.window.activeTextEditor;
     if (!activeEditor) return;
     const fileName = activeEditor.document.fileName;
