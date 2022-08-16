@@ -69,10 +69,10 @@ export function activate(context: vscode.ExtensionContext) {
     while ((match = regex.exec(text))) {
       const pos = activeEditor.document.positionAt(match.index);
       const line = activeEditor.document.lineAt(pos);
-      addDecoration(start, match, activeEditor);
+      addDecoration(start, activeEditor, match);
       start = { match, pos, line };
     }
-    if (match) addDecoration(start, match, activeEditor);
+    addDecoration(start, activeEditor);
 
     if (!activeEditor) return;
 
@@ -83,8 +83,8 @@ export function activate(context: vscode.ExtensionContext) {
 
   function addDecoration(
     start: any,
-    match: RegExpExecArray,
-    activeEditor: vscode.TextEditor
+    activeEditor: vscode.TextEditor,
+    match?: RegExpExecArray
   ) {
     if (start) {
       const decoration = decorations.find((d) => {
