@@ -23,9 +23,13 @@
     "main": "./out/extension.js",
     "contributes": {
         "configuration": {
-            "todoHighlight.doneColor": {
-                "type": "string",
-                "default": "rgba(128,32,32,0.6)"
+            "title": "Todo Highlight",
+            "properties": {
+                "todoHighlight.doneColor": {
+                    "type": "string",
+                    "default": "rgba(130,230,130,0.3)",
+                    "description": "Background color for completed (done) tasks"
+                }
             }
         }
     },

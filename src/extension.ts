@@ -1,48 +1,68 @@
 import * as vscode from "vscode";
 const { Range, Position } = vscode;
 
-let decorations = [
-  {
-    name: "todo",
-    token: "- ",
-    decorationType: vscode.window.createTextEditorDecorationType({
-      backgroundColor: "rgb(230, 130, 130, 0.3)",
-      overviewRulerColor: "red",
-      isWholeLine: true,
-    }),
-    matchs: new Array(),
-  },
-  {
-    name: "done",
-    token: "+ ",
-    decorationType: vscode.window.createTextEditorDecorationType({
-      backgroundColor: "rgb(130,230,130, 0.3)",
-      overviewRulerColor: "green",
-      isWholeLine: true,
-      opacity: "0.4",
-    }),
-    matchs: new Array(),
-  },
-  {
-    name: "outcome",
-    token: "-> ",
-    decorationType: vscode.window.createTextEditorDecorationType({
-      backgroundColor: "rgb(130, 130, 230, 0.3)",
-      overviewRulerColor: "blue",
-      isWholeLine: true,
-    }),
-    matchs: new Array(),
-  },
-];
+type Decoration = {
+  name: string;
+  token: string;
+  decorationType: vscode.TextEditorDecorationType;
+  matchs: vscode.Range[];
+};
+
+let decorations: Decoration[] = [];
+
+function createDecorations(): Decoration[] {
+  const config = vscode.workspace.getConfiguration("todoHighlight");
+  const doneColor = config.get<string>("doneColor", "rgba(130,230,130,0.3)");
+
+  return [
+    {
+      name: "todo",
+      token: "- ",
+      decorationType: vscode.window.createTextEditorDecorationType({
+        backgroundColor: "rgb(230, 130, 130, 0.3)",
+        overviewRulerColor: "red",
+        isWholeLine: true,
+      }),
+      matchs: [],
+    },
+    {
+      name: "done",
+      token: "+ ",
+      decorationType: vscode.window.createTextEditorDecorationType({
+        backgroundColor: doneColor,
+        overviewRulerColor: "green",
+        isWholeLine: true,
+        opacity: "0.4",
+      }),
+      matchs: [],
+    },
+    {
+      name: "outcome",
+      token: "-> ",
+      decorationType: vscode.window.createTextEditorDecorationType({
+        backgroundColor: "rgb(130, 130, 230, 0.3)",
+        overviewRulerColor: "blue",
+        isWholeLine: true,
+      }),
+      matchs: [],
+    },
+  ];
+}
+
+function disposeDecorations() {
+  decorations.forEach((d) => d.decorationType.dispose());
+}
 
 function escape(text: string) {
   return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 }
-const tokens = decorations
-  .map((d) => d.token)
-  .map(escape)
-  .join("|");
-var regex = new RegExp(`^([\t ]*(?:--|${tokens}))`, "gm");
+function buildRegex() {
+  const tokens = decorations
+    .map((d) => d.token)
+    .map(escape)
+    .join("|");
+  return new RegExp(`^([\t ]*(?:--|${tokens}))`, "gm");
+}
 
 export function activate(context: vscode.ExtensionContext) {
   const activeEditor = vscode.window.activeTextEditor;
@@ -55,8 +75,16 @@ export function activate(context: vscode.ExtensionContext) {
     debounceTimer = setTimeout(() => update(), 150);
   }
 
+  decorations = createDecorations();
+
   context.subscriptions.push(
-    vscode.workspace.onDidChangeConfiguration(() => debouncedUpdate()),
+    vscode.workspace.onDidChangeConfiguration((e) => {
+      if (e.affectsConfiguration("todoHighlight")) {
+        disposeDecorations();
+        decorations = createDecorations();
+      }
+      debouncedUpdate();
+    }),
     vscode.workspace.onDidChangeTextDocument((e) => {
       if (e.document === vscode.window.activeTextEditor?.document) {
         debouncedUpdate();
@@ -77,7 +105,7 @@ export function activate(context: vscode.ExtensionContext) {
     if (!fileName.endsWith(".todo")) return;
 
     decorations.forEach((d) => (d.matchs = []));
-    regex.lastIndex = 0;
+    const regex = buildRegex();
 
     var text = activeEditor.document.getText();
     let match, start;
@@ -125,5 +153,5 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {
-  decorations.forEach((d) => d.decorationType.dispose());
+  disposeDecorations();
 }
