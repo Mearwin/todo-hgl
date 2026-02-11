@@ -18,7 +18,7 @@
         "watch": "tsc -watch -p ./"
     },
     "activationEvents": [
-        "*"
+        "onStartupFinished"
     ],
     "main": "./out/extension.js",
     "contributes": {
@@ -30,8 +30,9 @@
         }
     },
     "devDependencies": {
+        "@types/node": "^25.2.3",
         "@types/vscode": "^1.67.0",
-        "typescript": "^4.6.4"
+        "typescript": "^5.9.3"
     },
     "publisher": "Todo-hgl"
 }

@@ -48,10 +48,25 @@ export function activate(context: vscode.ExtensionContext) {
   const activeEditor = vscode.window.activeTextEditor;
   if (!activeEditor) return;
 
+  let debounceTimer: ReturnType<typeof setTimeout> | undefined;
+
+  function debouncedUpdate() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => update(), 150);
+  }
+
   context.subscriptions.push(
-    vscode.workspace.onDidChangeConfiguration(() => update()),
-    vscode.workspace.onDidChangeTextDocument(() => update()),
-    vscode.window.onDidChangeActiveTextEditor(() => update())
+    vscode.workspace.onDidChangeConfiguration(() => debouncedUpdate()),
+    vscode.workspace.onDidChangeTextDocument((e) => {
+      if (e.document === vscode.window.activeTextEditor?.document) {
+        debouncedUpdate();
+      }
+    }),
+    vscode.window.onDidChangeActiveTextEditor(() => {
+      clearTimeout(debounceTimer);
+      update();
+    }),
+    { dispose: () => clearTimeout(debounceTimer) },
   );
 
   update();
@@ -62,6 +77,7 @@ export function activate(context: vscode.ExtensionContext) {
     if (!fileName.endsWith(".todo")) return;
 
     decorations.forEach((d) => (d.matchs = []));
+    regex.lastIndex = 0;
 
     var text = activeEditor.document.getText();
     let match, start;
@@ -106,4 +122,8 @@ export function activate(context: vscode.ExtensionContext) {
       decoration.matchs.push(range);
     }
   }
+}
+
+export function deactivate() {
+  decorations.forEach((d) => d.decorationType.dispose());
 }
