@@ -26,6 +26,20 @@
     ],
     "main": "./out/extension.js",
     "contributes": {
+        "commands": [
+            {
+                "command": "todoHighlight.toggleState",
+                "title": "Todo Highlight: Toggle Task State"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "todoHighlight.toggleState",
+                "key": "ctrl+shift+t",
+                "mac": "cmd+shift+t",
+                "when": "editorTextFocus && resourceExtname == .todo"
+            }
+        ],
         "configuration": {
             "title": "Todo Highlight",
             "properties": {

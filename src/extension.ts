@@ -1,4 +1,6 @@
 import * as vscode from "vscode";
+import { registerToggleCommand } from "./toggleState";
+import { TOKENS } from "./tokens";
 const { Range, Position } = vscode;
 
 type Decoration = {
@@ -39,7 +41,7 @@ export function activate(context: vscode.ExtensionContext) {
     return [
       {
         name: "todo",
-        token: "- ",
+        token: TOKENS.todo,
         decorationType: vscode.window.createTextEditorDecorationType({
           backgroundColor: todoColor,
           overviewRulerColor: "red",
@@ -49,7 +51,7 @@ export function activate(context: vscode.ExtensionContext) {
       },
       {
         name: "done",
-        token: "+ ",
+        token: TOKENS.done,
         decorationType: vscode.window.createTextEditorDecorationType({
           backgroundColor: doneColor,
           overviewRulerColor: "green",
@@ -60,7 +62,7 @@ export function activate(context: vscode.ExtensionContext) {
       },
       {
         name: "outcome",
-        token: "-> ",
+        token: TOKENS.outcome,
         decorationType: vscode.window.createTextEditorDecorationType({
           backgroundColor: outcomeColor,
           overviewRulerColor: "blue",
@@ -109,6 +111,8 @@ export function activate(context: vscode.ExtensionContext) {
       },
     },
   );
+
+  registerToggleCommand(context);
 
   update();
   function update() {

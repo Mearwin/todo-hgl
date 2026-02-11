@@ -31,6 +31,12 @@ Lines are highlighted based on their prefix token, and the highlighting spans mu
 3. Run `npm run compile`
 4. Press `F5` in VS Code to launch the Extension Development Host
 
+## Commands & Keybindings
+
+| Command | Keybinding | Description |
+|---------|------------|-------------|
+| `Todo Highlight: Toggle Task State` | `Ctrl+Shift+T` (`Cmd+Shift+T` on Mac) | Cycles the current line's prefix through `- ` → `+ ` → `-> ` → `-- ` → `- `. Works on multiple lines when selected. |
+
 ## Configuration
 
 | Setting | Description | Default |
