@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Dark rounded background -->
+  <rect width="128" height="128" rx="20" fill="#1e1e2e"/>
+
+  <!-- Pending item: - (red) -->
+  <line x1="20" y1="36" x2="32" y2="36" stroke="rgb(230,130,130)" stroke-width="4" stroke-linecap="round"/>
+  <rect x="44" y="32" width="64" height="8" rx="4" fill="rgb(230,130,130)" opacity="0.8"/>
+
+  <!-- Done item: + (green) -->
+  <line x1="20" y1="64" x2="32" y2="64" stroke="rgb(130,230,130)" stroke-width="4" stroke-linecap="round"/>
+  <line x1="26" y1="58" x2="26" y2="70" stroke="rgb(130,230,130)" stroke-width="4" stroke-linecap="round"/>
+  <rect x="44" y="60" width="64" height="8" rx="4" fill="rgb(130,230,130)" opacity="0.8"/>
+
+  <!-- Outcome item: -> (blue) -->
+  <line x1="18" y1="92" x2="30" y2="92" stroke="rgb(130,130,230)" stroke-width="4" stroke-linecap="round"/>
+  <polyline points="27,86 34,92 27,98" fill="none" stroke="rgb(130,130,230)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="44" y="88" width="64" height="8" rx="4" fill="rgb(130,130,230)" opacity="0.8"/>
+</svg>
