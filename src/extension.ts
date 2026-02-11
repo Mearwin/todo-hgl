@@ -72,9 +72,6 @@ export function activate(context: vscode.ExtensionContext) {
     return new RegExp(`^([\t ]*(?:--|${tokens}))`, "gm");
   }
 
-  const activeEditor = vscode.window.activeTextEditor;
-  if (!activeEditor) return;
-
   let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 
   function debouncedUpdate() {
@@ -144,7 +141,7 @@ export function activate(context: vscode.ExtensionContext) {
   ) {
     if (start) {
       const decoration = decorations.find((d) => {
-        return start.match[1].includes(d.token);
+        return start.match[1].endsWith(d.token);
       });
 
       if (!decoration) return;

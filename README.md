@@ -35,4 +35,4 @@ Lines are highlighted based on their prefix token, and the highlighting spans mu
 
 | Setting | Description | Default |
 |---------|-------------|---------|
-| `todoHighlight.doneColor` | Background color for done items | `rgba(128,32,32,0.6)` |
+| `todoHighlight.doneColor` | Background color for done items | `rgba(130,230,130,0.3)` |
