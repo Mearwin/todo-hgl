@@ -5,7 +5,13 @@ type Decoration = {
   name: string;
   token: string;
   decorationType: vscode.TextEditorDecorationType;
-  matchs: vscode.Range[];
+  matches: vscode.Range[];
+};
+
+type MatchStart = {
+  match: RegExpExecArray;
+  pos: vscode.Position;
+  line: vscode.TextLine;
 };
 
 let decorations: Decoration[] = [];
@@ -23,7 +29,7 @@ function createDecorations(): Decoration[] {
         overviewRulerColor: "red",
         isWholeLine: true,
       }),
-      matchs: [],
+      matches: [],
     },
     {
       name: "done",
@@ -34,7 +40,7 @@ function createDecorations(): Decoration[] {
         isWholeLine: true,
         opacity: "0.4",
       }),
-      matchs: [],
+      matches: [],
     },
     {
       name: "outcome",
@@ -44,7 +50,7 @@ function createDecorations(): Decoration[] {
         overviewRulerColor: "blue",
         isWholeLine: true,
       }),
-      matchs: [],
+      matches: [],
     },
   ];
 }
@@ -104,11 +110,12 @@ export function activate(context: vscode.ExtensionContext) {
     const fileName = activeEditor.document.fileName;
     if (!fileName.endsWith(".todo")) return;
 
-    decorations.forEach((d) => (d.matchs = []));
+    decorations.forEach((d) => (d.matches = []));
     const regex = buildRegex();
 
-    var text = activeEditor.document.getText();
-    let match, start;
+    const text = activeEditor.document.getText();
+    let match: RegExpExecArray | null;
+    let start: MatchStart | undefined;
 
     while ((match = regex.exec(text))) {
       const pos = activeEditor.document.positionAt(match.index);
@@ -118,15 +125,13 @@ export function activate(context: vscode.ExtensionContext) {
     }
     addDecoration(start, activeEditor);
 
-    if (!activeEditor) return;
-
-    Object.entries(decorations).forEach(([, { decorationType, matchs }]) => {
-      activeEditor.setDecorations(decorationType, matchs);
+    Object.entries(decorations).forEach(([, { decorationType, matches }]) => {
+      activeEditor.setDecorations(decorationType, matches);
     });
   }
 
   function addDecoration(
-    start: any,
+    start: MatchStart | undefined,
     activeEditor: vscode.TextEditor,
     match?: RegExpExecArray
   ) {
@@ -147,7 +152,7 @@ export function activate(context: vscode.ExtensionContext) {
         endPos = lastLine.range.end;
       }
       const range = new Range(new Position(start.line.lineNumber, 0), endPos);
-      decoration.matchs.push(range);
+      decoration.matches.push(range);
     }
   }
 }
