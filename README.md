@@ -36,3 +36,5 @@ Lines are highlighted based on their prefix token, and the highlighting spans mu
 | Setting | Description | Default |
 |---------|-------------|---------|
 | `todoHighlight.doneColor` | Background color for done items | `rgba(130,230,130,0.3)` |
+| `todoHighlight.todoColor` | Background color for pending (todo) tasks | `rgba(230,130,130,0.3)` |
+| `todoHighlight.outcomeColor` | Background color for outcome/result items | `rgba(130,130,230,0.3)` |

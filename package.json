@@ -16,6 +16,7 @@
     "scripts": {
         "vscode:prepublish": "npm run compile",
         "compile": "tsc -p ./",
+        "test": "vitest run",
         "watch": "tsc -watch -p ./",
         "package": "vsce package"
     },
@@ -31,6 +32,16 @@
                     "type": "string",
                     "default": "rgba(130,230,130,0.3)",
                     "description": "Background color for completed (done) tasks"
+                },
+                "todoHighlight.todoColor": {
+                    "type": "string",
+                    "default": "rgba(230,130,130,0.3)",
+                    "description": "Background color for pending (todo) tasks"
+                },
+                "todoHighlight.outcomeColor": {
+                    "type": "string",
+                    "default": "rgba(130,130,230,0.3)",
+                    "description": "Background color for outcome/result items"
                 }
             }
         }
@@ -39,6 +50,7 @@
         "@types/node": "^25.2.3",
         "@types/vscode": "^1.67.0",
         "@vscode/vsce": "^3.3.2",
+        "vitest": "^3.0.0",
         "typescript": "^5.9.3"
     },
     "publisher": "Todo-hgl"

@@ -14,19 +14,34 @@ type MatchStart = {
   line: vscode.TextLine;
 };
 
+export function escape(text: string): string {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+}
+
+export function buildRegex(tokens: string[]): RegExp {
+  const escaped = tokens.map(escape).join("|");
+  return new RegExp(`^([\t ]*(?:--|${escaped}))`, "gm");
+}
+
+export function findDecoration(matchGroup: string, tokens: string[]): number {
+  return tokens.findIndex((t) => matchGroup.endsWith(t));
+}
+
 export function activate(context: vscode.ExtensionContext) {
   let decorations: Decoration[] = [];
 
   function createDecorations(): Decoration[] {
     const config = vscode.workspace.getConfiguration("todoHighlight");
     const doneColor = config.get<string>("doneColor", "rgba(130,230,130,0.3)");
+    const todoColor = config.get<string>("todoColor", "rgba(230,130,130,0.3)");
+    const outcomeColor = config.get<string>("outcomeColor", "rgba(130,130,230,0.3)");
 
     return [
       {
         name: "todo",
         token: "- ",
         decorationType: vscode.window.createTextEditorDecorationType({
-          backgroundColor: "rgb(230, 130, 130, 0.3)",
+          backgroundColor: todoColor,
           overviewRulerColor: "red",
           isWholeLine: true,
         }),
@@ -47,7 +62,7 @@ export function activate(context: vscode.ExtensionContext) {
         name: "outcome",
         token: "-> ",
         decorationType: vscode.window.createTextEditorDecorationType({
-          backgroundColor: "rgb(130, 130, 230, 0.3)",
+          backgroundColor: outcomeColor,
           overviewRulerColor: "blue",
           isWholeLine: true,
         }),
@@ -58,18 +73,6 @@ export function activate(context: vscode.ExtensionContext) {
 
   function disposeDecorations() {
     decorations.forEach((d) => d.decorationType.dispose());
-  }
-
-  function escape(text: string) {
-    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
-  }
-
-  function buildRegex() {
-    const tokens = decorations
-      .map((d) => d.token)
-      .map(escape)
-      .join("|");
-    return new RegExp(`^([\t ]*(?:--|${tokens}))`, "gm");
   }
 
   let debounceTimer: ReturnType<typeof setTimeout> | undefined;
@@ -115,7 +118,8 @@ export function activate(context: vscode.ExtensionContext) {
     if (!fileName.endsWith(".todo")) return;
 
     decorations.forEach((d) => (d.matches = []));
-    const regex = buildRegex();
+    const tokens = decorations.map((d) => d.token);
+    const regex = buildRegex(tokens);
 
     const text = activeEditor.document.getText();
     let match: RegExpExecArray | null;
@@ -140,11 +144,10 @@ export function activate(context: vscode.ExtensionContext) {
     match?: RegExpExecArray
   ) {
     if (start) {
-      const decoration = decorations.find((d) => {
-        return start.match[1].endsWith(d.token);
-      });
+      const tokens = decorations.map((d) => d.token);
+      const idx = findDecoration(start.match[1], tokens);
 
-      if (!decoration) return;
+      if (idx === -1) return;
 
       let endPos;
       if (match) {
@@ -156,7 +159,7 @@ export function activate(context: vscode.ExtensionContext) {
         endPos = lastLine.range.end;
       }
       const range = new Range(new Position(start.line.lineNumber, 0), endPos);
-      decoration.matches.push(range);
+      decorations[idx].matches.push(range);
     }
   }
 }
