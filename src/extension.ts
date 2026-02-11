@@ -14,63 +14,64 @@ type MatchStart = {
   line: vscode.TextLine;
 };
 
-let decorations: Decoration[] = [];
-
-function createDecorations(): Decoration[] {
-  const config = vscode.workspace.getConfiguration("todoHighlight");
-  const doneColor = config.get<string>("doneColor", "rgba(130,230,130,0.3)");
-
-  return [
-    {
-      name: "todo",
-      token: "- ",
-      decorationType: vscode.window.createTextEditorDecorationType({
-        backgroundColor: "rgb(230, 130, 130, 0.3)",
-        overviewRulerColor: "red",
-        isWholeLine: true,
-      }),
-      matches: [],
-    },
-    {
-      name: "done",
-      token: "+ ",
-      decorationType: vscode.window.createTextEditorDecorationType({
-        backgroundColor: doneColor,
-        overviewRulerColor: "green",
-        isWholeLine: true,
-        opacity: "0.4",
-      }),
-      matches: [],
-    },
-    {
-      name: "outcome",
-      token: "-> ",
-      decorationType: vscode.window.createTextEditorDecorationType({
-        backgroundColor: "rgb(130, 130, 230, 0.3)",
-        overviewRulerColor: "blue",
-        isWholeLine: true,
-      }),
-      matches: [],
-    },
-  ];
-}
-
-function disposeDecorations() {
-  decorations.forEach((d) => d.decorationType.dispose());
-}
-
-function escape(text: string) {
-  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
-}
-function buildRegex() {
-  const tokens = decorations
-    .map((d) => d.token)
-    .map(escape)
-    .join("|");
-  return new RegExp(`^([\t ]*(?:--|${tokens}))`, "gm");
-}
-
 export function activate(context: vscode.ExtensionContext) {
+  let decorations: Decoration[] = [];
+
+  function createDecorations(): Decoration[] {
+    const config = vscode.workspace.getConfiguration("todoHighlight");
+    const doneColor = config.get<string>("doneColor", "rgba(130,230,130,0.3)");
+
+    return [
+      {
+        name: "todo",
+        token: "- ",
+        decorationType: vscode.window.createTextEditorDecorationType({
+          backgroundColor: "rgb(230, 130, 130, 0.3)",
+          overviewRulerColor: "red",
+          isWholeLine: true,
+        }),
+        matches: [],
+      },
+      {
+        name: "done",
+        token: "+ ",
+        decorationType: vscode.window.createTextEditorDecorationType({
+          backgroundColor: doneColor,
+          overviewRulerColor: "green",
+          isWholeLine: true,
+          opacity: "0.4",
+        }),
+        matches: [],
+      },
+      {
+        name: "outcome",
+        token: "-> ",
+        decorationType: vscode.window.createTextEditorDecorationType({
+          backgroundColor: "rgb(130, 130, 230, 0.3)",
+          overviewRulerColor: "blue",
+          isWholeLine: true,
+        }),
+        matches: [],
+      },
+    ];
+  }
+
+  function disposeDecorations() {
+    decorations.forEach((d) => d.decorationType.dispose());
+  }
+
+  function escape(text: string) {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+  }
+
+  function buildRegex() {
+    const tokens = decorations
+      .map((d) => d.token)
+      .map(escape)
+      .join("|");
+    return new RegExp(`^([\t ]*(?:--|${tokens}))`, "gm");
+  }
+
   const activeEditor = vscode.window.activeTextEditor;
   if (!activeEditor) return;
 
@@ -101,6 +102,12 @@ export function activate(context: vscode.ExtensionContext) {
       update();
     }),
     { dispose: () => clearTimeout(debounceTimer) },
+    {
+      dispose: () => {
+        disposeDecorations();
+        decorations = [];
+      },
+    },
   );
 
   update();
@@ -125,7 +132,7 @@ export function activate(context: vscode.ExtensionContext) {
     }
     addDecoration(start, activeEditor);
 
-    Object.entries(decorations).forEach(([, { decorationType, matches }]) => {
+    decorations.forEach(({ decorationType, matches }) => {
       activeEditor.setDecorations(decorationType, matches);
     });
   }
@@ -157,6 +164,4 @@ export function activate(context: vscode.ExtensionContext) {
   }
 }
 
-export function deactivate() {
-  disposeDecorations();
-}
+export function deactivate() {}
